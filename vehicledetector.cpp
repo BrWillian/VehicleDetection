@@ -1,14 +1,14 @@
 #include "vehicledetector.h"
 
-
+/*
 VehicleDetector::VehicleDetector()
 {
     cfg_path = std::getenv("CFG_PATH");
     weight_path = std::getenv("WEIGHT_PATH");
     class_path = std::getenv("CLASS_PATH");
     initDetectionModel();
-}
-VehicleDetector::VehicleDetector(std::string cfg_path, std::string weight_path, std::string class_path)
+}*/
+VehicleDetector::VehicleDetector(const char* cfg_path, const char* weight_path, const char* class_path)
 {
     this->cfg_path = cfg_path;
     this->weight_path = weight_path;
@@ -108,15 +108,23 @@ const char* VehicleDetector::SingleDetection(cv::Mat img, float thresh)
     free_image(im);
     free_image(im_sized);
 
-    return "teste";
+    return strdup("teste");
 }
-const char* C_SingleDetection(VehicleDetector* v, char* imgData, size_t imgSize, float thres)
+const char* CDECL C_SingleDetection(VehicleDetector* v, char* imgData, size_t imgSize, float thres)
 {
     try {
         std::vector<uchar> data(imgData, imgData + imgSize);
         cv::Mat img = cv::imdecode(cv::Mat(data), -1);
         return v->SingleDetection(img, thres);
     } catch (const std::exception& e) {
-        return e.what();
+        return strdup(e.what());
     }
+}
+VehicleDetector* CDECL C_CreateVehicleDetection(const char* cfg_path, const char* weight_path, const char* class_path)
+{
+    VehicleDetector* obj;
+
+    obj = new VehicleDetector(cfg_path, weight_path, class_path);
+
+    return obj;
 }
