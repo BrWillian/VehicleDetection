@@ -33,12 +33,12 @@ private:
 public:
     VehicleDetector(const char* cfg_path, const char* weight_path, const char* class_path);
     virtual ~VehicleDetector();
-    const char* SingleDetection(cv::Mat, float thresh = 0.5);
+    std::string SingleDetection(cv::Mat, float thresh);
 };
 
 extern "C" {
     EXPORT VehicleDetector* CDECL C_CreateVehicleDetection(const char* cfg_path, const char* weight_path, const char* class_path);
-    EXPORT const char* CDECL C_SingleDetection(VehicleDetector* v, char* imgData, size_t imgSize, float thres = 0.5);
+    EXPORT char* CDECL C_SingleDetection(VehicleDetector* v, char* imgData, size_t imgSize, float thres);
 }
 
 #endif // VEHICLEDETECTOR_H
