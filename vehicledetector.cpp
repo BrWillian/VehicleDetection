@@ -43,11 +43,10 @@ void VehicleDetector::GetClasses()
 }
 std::string VehicleDetector::SingleDetection(cv::Mat img, float thresh)
 {
+    result = new std::map<std::string, std::vector<cv::Rect>>();
 #ifndef NDEBUG
     assert(false == img.empty());
 #endif
-    std::map<std::string, std::vector<cv::Rect>> returnVal;
-
     //Alocar imagem
     image im = make_image(img.cols, img.rows, 3);
 
@@ -70,7 +69,7 @@ std::string VehicleDetector::SingleDetection(cv::Mat img, float thresh)
     network_predict(net, im_pred);
     int boxes = 0;
 
-    detection *detections = get_network_boxes(net, im.w, im.h, thresh, 0.5, nullptr, 1, &boxes);
+    detection *detections = get_network_boxes(net, im.w, im.h, thresh, 0.5, 0, 1, &boxes);
 
     layer l = net->layers[net->n-1];
 
@@ -95,7 +94,8 @@ std::string VehicleDetector::SingleDetection(cv::Mat img, float thresh)
             if(right > im.w - 1) right = im.w - 1;
             if(top < 0) top = 0;
             if(botton > im.h - 1) botton = im.h - 1;
-            returnVal[classes[_class]].push_back(cv::Rect(cv::Point(left, top), cv::Point(right + 1, botton +1)));
+            std::cout<<_class<<std::endl;
+            //(*result)[classes[_class]].push_back(cv::Rect(cv::Point(left, top), cv::Point(right + 1, botton +1)));
         }
     }
 
@@ -104,7 +104,19 @@ std::string VehicleDetector::SingleDetection(cv::Mat img, float thresh)
     free_image(im);
     free_image(im_sized);
 
-    return strdup("foi");
+    return strdup(Serialize(result).c_str());
+}
+std::string VehicleDetector::Serialize(std::map<std::string, std::vector<cv::Rect> > *result)
+{
+    std::string tmp = "";
+    for(auto &object: (*result))
+    {
+        tmp += object.first+"\n";
+        //std::cout<<object.first<<std::endl;
+
+    }
+
+    return tmp;
 }
 char* CDECL C_SingleDetection(VehicleDetector* v, char* imgData, size_t imgSize, float thres)
 {

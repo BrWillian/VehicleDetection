@@ -26,9 +26,11 @@ private:
     std::string cfg_path;
     std::string weight_path;
     std::string class_path;
-    std::vector<std::string> classes;
+    std::vector<std::string> classes = {"carro", "moto", "caminhonete", "caminhao", "carretinha", "onibus", "van"};
+    std::map<std::string, std::vector<cv::Rect>> *result;
     void initDetectionModel();
     void GetClasses();
+    std::string Serialize(std::map<std::string, std::vector<cv::Rect>> *result);
     network *net;
 public:
     VehicleDetector(const char* cfg_path, const char* weight_path, const char* class_path);
