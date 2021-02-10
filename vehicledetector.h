@@ -3,6 +3,7 @@
 
 #include "vehicledetector_global.h"
 #include <opencv2/opencv.hpp>
+#include <sstream>
 #include <fstream>
 #include <vector>
 #include <map>
@@ -26,11 +27,19 @@ private:
     std::string cfg_path;
     std::string weight_path;
     std::string class_path;
-    std::vector<std::string> classes = {"carro", "moto", "caminhonete", "caminhao", "carretinha", "onibus", "van"};
-    std::map<std::string, std::vector<cv::Rect>> *result;
+    std::vector<std::string> classes = {"carro",
+                                        "moto",
+                                        "onibus",
+                                        "caminhao",
+                                        "carretinha",
+                                        "caminhonete",
+                                        "van"};
+
+    std::map<std::string, cv::Rect> *result;
     void initDetectionModel();
     void GetClasses();
-    std::string Serialize(std::map<std::string, std::vector<cv::Rect>> *result);
+    std::string Serialize(std::map<std::string, cv::Rect> *result);
+    const char* rect_to_string(cv::Rect pts);
     network *net;
 public:
     VehicleDetector(const char* cfg_path, const char* weight_path, const char* class_path);
@@ -39,8 +48,8 @@ public:
 };
 
 extern "C" {
-    EXPORT VehicleDetector* CDECL C_CreateVehicleDetection(const char* cfg_path, const char* weight_path, const char* class_path);
-    EXPORT char* CDECL C_SingleDetection(VehicleDetector* v, char* imgData, size_t imgSize, float thres);
+    EXPORT VehicleDetector* C_CreateVehicleDetection(const char* cfg_path, const char* weight_path, const char* class_path);
+    EXPORT char* C_SingleDetection(VehicleDetector* v, char* imgData, size_t imgSize, float thres);
 }
 
 #endif // VEHICLEDETECTOR_H
